@@ -1,5 +1,4 @@
 import { ProductCard } from "@/components";
-import React from "react";
 import { Product } from "@/models/product";
 
 const products: Product[] = [
@@ -23,7 +22,7 @@ const products: Product[] = [
   },
 ];
 
-export default function ProductsPage() {
+export default function ProductsView() {
   return (
     <div className="flex flex-col gap-y-4">
       <h1 className="flex justify-center items-center text-5xl p-2 italic">

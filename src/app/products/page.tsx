@@ -1,6 +1,5 @@
-import React from "react";
-import ProductsPage from "@/views/products-page";
+import ProductsView from "@/views/products-page";
 
-export default function Products() {
-  return <ProductsPage />;
+export default function ProductsPage() {
+  return <ProductsView />;
 }
