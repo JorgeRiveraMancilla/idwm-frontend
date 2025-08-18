@@ -12,7 +12,6 @@ The following technologies are required to execute the project
 
 - [Visual Studio Code 1.89.1+](https://code.visualstudio.com/)
 - [Node 22+](https://nodejs.org/es/download)
-- [Next.js 15.4.6+](https://nextjs.org/docs)
 - [Git 2.45.1+](https://git-scm.com/downloads)
 
 Once everything is installed, run the project by following the steps in the next section.
