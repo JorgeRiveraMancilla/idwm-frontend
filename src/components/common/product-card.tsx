@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Button } from "../ui/button";
+import { Button } from "@/components";
 import { Product } from "@/models/product";
 
 interface ProductCardProps {
