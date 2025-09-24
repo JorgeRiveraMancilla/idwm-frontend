@@ -1,3 +1,5 @@
+import { ErrorDetail } from "@/models/generics";
+
 export const extractErrorMessage = (error: unknown): string => {
   if (
     error &&
@@ -55,7 +57,9 @@ export const extractErrorMessage = (error: unknown): string => {
   return "Ha ocurrido un error inesperado";
 };
 
-export const getErrorDetails = (error: unknown) => {
+export const getErrorDetails = (
+  error: unknown
+): ErrorDetail & { canRetry: boolean } => {
   const getStatus = (): number | undefined => {
     if (
       error &&
@@ -73,12 +77,12 @@ export const getErrorDetails = (error: unknown) => {
 
   const status = getStatus();
   const isNetworkError = !status;
+
   if (isNetworkError) {
     return {
-      type: "network",
-      title: "Error de Conexión",
       message:
         "No se pudo conectar con el servidor. Verifica tu conexión a internet.",
+      details: "Error de red",
       canRetry: true,
     };
   }
@@ -86,17 +90,15 @@ export const getErrorDetails = (error: unknown) => {
   switch (status) {
     case 400:
       return {
-        type: "validation",
-        title: "Error de Validación",
         message: extractErrorMessage(error),
+        details: "Error de validación",
         canRetry: false,
       };
 
     case 404:
       return {
-        type: "not-found",
-        title: "No Encontrado",
         message: "El recurso solicitado no existe o ha sido eliminado.",
+        details: "Recurso no encontrado",
         canRetry: false,
       };
 
@@ -105,18 +107,16 @@ export const getErrorDetails = (error: unknown) => {
     case 503:
     case 504:
       return {
-        type: "server",
-        title: "Error del Servidor",
         message:
           "Ha ocurrido un error interno en el servidor. Intenta nuevamente más tarde.",
+        details: "Error del servidor",
         canRetry: true,
       };
 
     default:
       return {
-        type: "unknown",
-        title: "Error Inesperado",
         message: extractErrorMessage(error),
+        details: "Error inesperado",
         canRetry: status >= 500,
       };
   }
