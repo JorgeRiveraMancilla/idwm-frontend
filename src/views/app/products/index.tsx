@@ -22,7 +22,7 @@ export default function ProductsView() {
   return (
     <Suspense fallback={<div>Cargando...</div>}>
       <div className="flex flex-col gap-y-4">
-        <h1 className="flex justify-center items-center text-5xl p-2 pt-4 italic">
+        <h1 className="flex justify-center items-center text-2xl sm:text-5xl p-2 pt-4 italic">
           Productos disponibles
         </h1>
 
