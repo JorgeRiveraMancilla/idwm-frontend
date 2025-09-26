@@ -1,123 +1,99 @@
+import { AxiosError } from "axios";
+
 import { ErrorDetail } from "@/models/generics";
 
-export const extractErrorMessage = (error: unknown): string => {
-  if (
-    error &&
-    typeof error === "object" &&
-    "response" in error &&
-    error.response &&
-    typeof error.response === "object" &&
-    "data" in error.response &&
-    error.response.data &&
-    typeof error.response.data === "object"
-  ) {
-    const responseData = error.response.data as Record<string, unknown>;
-
-    if (responseData.errors && typeof responseData.errors === "object") {
-      const errors = responseData.errors as Record<string, unknown>;
-      const allMessages: string[] = [];
-
-      Object.values(errors).forEach(fieldErrors => {
-        if (Array.isArray(fieldErrors)) {
-          fieldErrors.forEach(item => {
-            if (typeof item === "string") {
-              allMessages.push(item);
-            }
-          });
-        }
-      });
-
-      return allMessages.length > 0
-        ? allMessages.join(", ")
-        : "Error de validación";
-    }
-
-    if (responseData.message && typeof responseData.message === "string") {
-      return responseData.message;
-    }
-
-    if (responseData.title && typeof responseData.title === "string") {
-      return responseData.title;
-    }
-  }
-
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  if (
-    error &&
-    typeof error === "object" &&
-    "message" in error &&
-    typeof (error as { message: unknown }).message === "string"
-  ) {
-    return (error as { message: string }).message;
-  }
-
-  return "Ha ocurrido un error inesperado";
-};
-
-export const getErrorDetails = (
+export const handleApiError = (
   error: unknown
 ): ErrorDetail & { canRetry: boolean } => {
-  const getStatus = (): number | undefined => {
-    if (
-      error &&
-      typeof error === "object" &&
-      "response" in error &&
-      error.response &&
-      typeof error.response === "object" &&
-      "status" in error.response &&
-      typeof (error.response as { status: unknown }).status === "number"
-    ) {
-      return (error.response as { status: number }).status;
+  if (error instanceof AxiosError) {
+    // Network/connection error
+    if (!error.response) {
+      console.log("Network error - no response received");
+      return {
+        message: "Error de red",
+        details: "No se pudo conectar con el servidor",
+        canRetry: true,
+      };
     }
-    return undefined;
-  };
 
-  const status = getStatus();
-  const isNetworkError = !status;
+    // Not found error with custom format
+    if (error.response.status === 404 && error.response.data) {
+      console.log("Not found error:", error.response.data);
+      const errorData = error.response.data as ErrorDetail;
+      return {
+        message: errorData.message || "Recurso no encontrado",
+        details: errorData.details,
+        canRetry: false,
+      };
+    }
 
-  if (isNetworkError) {
+    // Other HTTP errors with custom format
+    if (error.response.data && typeof error.response.data === "object") {
+      console.log("HTTP error with custom format:", error.response.data);
+
+      if (error.response.data.errors) {
+        console.log("Array of errors:", error.response.data.errors);
+        const errors = Object.values(error.response.data.errors)
+          .flat()
+          .join(", ");
+        return {
+          message:
+            error.response.data.message || `Error ${error.response.status}`,
+          details: errors,
+          canRetry: error.response.status >= 500,
+        };
+      }
+
+      const errorData = error.response.data as ErrorDetail;
+
+      if (errorData.message === "Argumento fuera de rango") {
+        return {
+          message: "Producto no encontrado",
+          details: "No se encontraron coincidencias con la búsqueda.",
+          canRetry: false,
+        };
+      }
+
+      return {
+        message: errorData.message || `Error ${error.response.status}`,
+        details: errorData.details,
+        canRetry: error.response.status >= 500,
+      };
+    }
+
+    // HTTP errors without custom format
     return {
-      message:
-        "No se pudo conectar con el servidor. Verifica tu conexión a internet.",
-      details: "Error de red",
-      canRetry: true,
+      message: getDefaultErrorMessage(error.response.status),
+      details: `Código de estado: ${error.response.status}`,
+      canRetry: error.response.status >= 500,
     };
   }
 
-  switch (status) {
+  // Generic Error
+  return {
+    message: "Ha ocurrido un error inesperado. Inténtalo nuevamente.",
+    details: undefined,
+    canRetry: true,
+  };
+};
+
+const getDefaultErrorMessage = (statusCode: number): string => {
+  switch (statusCode) {
     case 400:
-      return {
-        message: extractErrorMessage(error),
-        details: "Error de validación",
-        canRetry: false,
-      };
-
+      return "Solicitud inválida. Verifica los datos enviados.";
+    case 401:
+      return "No tienes autorización para realizar esta acción.";
+    case 403:
+      return "No tienes permisos para acceder a este recurso.";
     case 404:
-      return {
-        message: "El recurso solicitado no existe o ha sido eliminado.",
-        details: "Recurso no encontrado",
-        canRetry: false,
-      };
-
+      return "El recurso solicitado no fue encontrado.";
     case 500:
+      return "Error interno del servidor. Inténtalo más tarde.";
     case 502:
+      return "El servidor no está disponible temporalmente.";
     case 503:
-    case 504:
-      return {
-        message:
-          "Ha ocurrido un error interno en el servidor. Intenta nuevamente más tarde.",
-        details: "Error del servidor",
-        canRetry: true,
-      };
-
+      return "Servicio no disponible. Inténtalo más tarde.";
     default:
-      return {
-        message: extractErrorMessage(error),
-        details: "Error inesperado",
-        canRetry: status >= 500,
-      };
+      return "Ha ocurrido un error. Inténtalo nuevamente.";
   }
 };
