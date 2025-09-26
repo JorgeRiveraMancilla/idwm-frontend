@@ -1,12 +1,14 @@
 import { Button } from "@/components/ui";
 
 interface ProductErrorStateProps {
-  error: unknown;
+  error: string;
+  canRetry: boolean;
   onRetry: () => void;
 }
 
 export const ProductErrorState = ({
   error,
+  canRetry,
   onRetry,
 }: ProductErrorStateProps) => {
   return (
@@ -15,13 +17,13 @@ export const ProductErrorState = ({
         <div className="text-center">
           <div className="font-semibold">Error al cargar el producto</div>
           <div className="text-sm mt-1">
-            {error && typeof error === "object" && "message" in error
-              ? String(error.message)
-              : "Ha ocurrido un error inesperado"}
+            {error && error !== "" ? error : "Ha ocurrido un error inesperado"}
           </div>
-          <Button className="m-2 bg-pink-950" onClick={onRetry}>
-            Reintentar
-          </Button>
+          {canRetry && (
+            <Button className="m-2 bg-pink-950" onClick={onRetry}>
+              Reintentar
+            </Button>
+          )}
         </div>
       </div>
     </div>
