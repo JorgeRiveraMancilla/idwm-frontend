@@ -7,7 +7,7 @@ import { AxiosError } from "axios";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { stringRegexValidation } from "@/lib";
+import { isValidId } from "@/lib";
 import { productService } from "@/services/product-service";
 import { SingleProductView } from "@/views/app/products/[id]";
 
@@ -20,7 +20,7 @@ export async function generateMetadata({
 }: SingleProductPageProps): Promise<Metadata> {
   const { id } = await params;
 
-  if (!stringRegexValidation(id, /^[1-9]\d*$/)) {
+  if (!isValidId(id)) {
     return notFound();
   }
 
@@ -60,7 +60,7 @@ export default async function SingleProductPage({
 }: SingleProductPageProps) {
   const { id } = await params;
 
-  if (stringRegexValidation(id, /^[1-9]\d*$/)) {
+  if (!isValidId(id)) {
     return notFound();
   }
 
