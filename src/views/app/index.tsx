@@ -14,14 +14,18 @@ export default function HomeView() {
           priority
           sizes="100vw"
         />
+
         <div className="absolute inset-0 bg-black opacity-50"></div>
+
         <div className="relative z-10 flex flex-col items-center justify-center h-full text-white min-h-screen text-center">
           <h1 className="text-4xl sm:text-6xl font-bold mb-4">
             Bienvenido a Tienda UCN
           </h1>
+
           <p className="text-lg sm:text-xl mb-8">
             Tu tienda oficial de la Universidad Católica del Norte
           </p>
+
           <Link
             href="/products"
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition-colors"

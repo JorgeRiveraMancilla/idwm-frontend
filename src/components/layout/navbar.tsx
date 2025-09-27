@@ -1,9 +1,10 @@
 "use client";
 
+import { MenuIcon, UserIcon, XIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { UserIcon, MenuIcon, XIcon } from "lucide-react";
-import { Button } from "@/components";
+
+import { Button } from "@/components/ui";
 
 export const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
