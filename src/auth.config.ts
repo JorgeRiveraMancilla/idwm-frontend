@@ -74,7 +74,6 @@ export const authConfig = {
           const user = extractUserFromJwt(token);
 
           if (!user || !user.id) {
-            console.error("Failed to extract user from token");
             return null;
           }
 
@@ -85,7 +84,6 @@ export const authConfig = {
             tokenExp: user.exp,
           };
         } catch (error) {
-          console.log("Error during authentication:", error);
           const apiError = handleApiError(error);
 
           throw new Error(apiError.details);
