@@ -2,9 +2,11 @@ import "./globals.css";
 
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { SessionProvider } from "next-auth/react";
 import { ReactNode } from "react";
 
 import { Footer, Navbar } from "@/components/layout";
+import { Toaster } from "@/components/ui/sonner";
 import { ReactQueryProvider } from "@/providers";
 
 const geistSans = Geist({
@@ -32,13 +34,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ReactQueryProvider>
-          <Navbar />
-
-          <main className="min-h-screen">{children}</main>
-
-          <Footer />
-        </ReactQueryProvider>
+        <SessionProvider>
+          <ReactQueryProvider>
+            <Toaster position="top-right" closeButton />
+            <Navbar />
+            <main className="min-h-screen">{children}</main>
+            <Footer />
+          </ReactQueryProvider>
+        </SessionProvider>
       </body>
     </html>
   );
