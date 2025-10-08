@@ -71,23 +71,5 @@
       "prettier --write"
     ],
     "package-lock.json": []
-  },
-  "knip": {
-    "ignoreDependencies": [
-      "eslint-config-next",
-      "next-auth",
-      "react-hook-form",
-      "zustand",
-      "tw-animate-css",
-      "pdf-lib",
-      "zod",
-      "eslint",
-      "tailwindcss"
-    ],
-    "ignore": [
-      "src/lib/utils.ts",
-      "src/components/ui/button.tsx",
-      "src/components/ui/carousel.tsx"
-    ]
   }
 }
