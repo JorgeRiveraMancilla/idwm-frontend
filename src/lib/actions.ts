@@ -2,7 +2,7 @@
 
 import { AuthError } from "next-auth";
 
-import { signIn, signOut } from "@/auth.config";
+import { signIn } from "@/auth.config";
 
 export async function loginAction(formData: {
   email: string;
@@ -24,8 +24,4 @@ export async function loginAction(formData: {
 
     return { ok: false, message: msg };
   }
-}
-
-export async function logoutAction() {
-  await signOut({ redirect: false });
 }
