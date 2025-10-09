@@ -19,7 +19,10 @@ export const useVerifyEmail = () => {
       await verifyEmailAsync(verifyData);
       toast.success("Cuenta verificada exitosamente. Redirigiendo...");
       router.push(`/auth/login`);
-    } catch (error) {}
+    } catch (error) {
+      const errorMessage = handleApiError(error).details;
+      toast.error(errorMessage);
+    }
   };
 
   return {

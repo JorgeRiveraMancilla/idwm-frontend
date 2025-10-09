@@ -109,15 +109,13 @@ export function VerifyEmailForm({ email }: Props) {
           )}
         />
 
-        {verifyError && verifyError.includes("ya ha sido verificado") ? (
+        {verifyError && verifyError.includes("ya ha sido verificado") && (
           <div className="text-sm text-red-600">
-            {verifyError}
+            {verifyError}{" "}
             <span className="font-semibold underline">
               <Link href={`/auth/login`}>Inicia sesión para continuar</Link>
             </span>
           </div>
-        ) : (
-          <div className="text-sm text-red-600">{verifyError}</div>
         )}
 
         <div className="flex justify-center items-center">

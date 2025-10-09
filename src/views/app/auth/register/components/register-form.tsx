@@ -94,7 +94,7 @@ const formSchema = z
   });
 
 export function RegisterForm() {
-  const { handleRegister, isLoading, error } = useRegister();
+  const { handleRegister, isLoading } = useRegister();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -299,10 +299,6 @@ export function RegisterForm() {
             </FormItem>
           )}
         />
-
-        {error && (
-          <div className="text-sm text-red-600 text-center">{error}</div>
-        )}
 
         <div className="flex justify-center items-center">
           <Button

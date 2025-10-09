@@ -6,11 +6,8 @@ import { handleApiError } from "@/lib/api";
 import { RegisterRequest } from "@/models/requests";
 
 export const useRegister = () => {
-  const {
-    mutateAsync: registerAsync,
-    isPending: isRegistering,
-    error: registerError,
-  } = useRegisterMutation();
+  const { mutateAsync: registerAsync, isPending: isRegistering } =
+    useRegisterMutation();
 
   const router = useRouter();
 
@@ -25,22 +22,21 @@ export const useRegister = () => {
       router.push(
         `/auth/verify-email?email=${encodeURIComponent(registerData.email)}`
       );
-    } catch (error) {}
-  };
+    } catch (error) {
+      const apiError = handleApiError(error);
 
-  const handleErrors = () => {
-    const apiError = handleApiError(registerError).details;
-
-    if (apiError?.includes("You can only send")) {
-      return "Sólo puedes registrar cuentas con el correo utilizado para el servicio de Resend.";
+      if (apiError.details?.includes("You can only send")) {
+        toast.error(
+          "Sólo puedes registrar cuentas con el correo utilizado para el servicio de Resend."
+        );
+      } else {
+        toast.error(apiError.details || "Error al registrar usuario");
+      }
     }
-
-    return apiError;
   };
 
   return {
     handleRegister,
     isLoading: isRegistering,
-    error: handleErrors(),
   };
 };

@@ -115,7 +115,7 @@ export function LoginForm() {
           )}
         />
 
-        {error && error.message.includes("no ha sido confirmado") ? (
+        {error && error.message.includes("no ha sido confirmado") && (
           <div className="text-sm text-yellow-800 text-center">
             Tu cuenta no ha sido confirmada. Revisa tu correo para el enlace de
             confirmación y{" "}
@@ -126,10 +126,6 @@ export function LoginForm() {
                 verifica tu cuenta
               </Link>
             </span>
-          </div>
-        ) : (
-          <div className="text-sm text-red-600 text-center">
-            {error?.message}
           </div>
         )}
         <div className="flex justify-center items-center">

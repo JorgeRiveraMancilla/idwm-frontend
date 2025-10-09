@@ -1,3 +1,4 @@
+import { AuthError } from "next-auth";
 import { toast } from "sonner";
 
 import { useLoginMutation } from "@/hooks/api";
@@ -21,7 +22,10 @@ export const useLogin = () => {
         rememberMe: data.rememberMe,
       });
       toast.success("Inicio de sesión exitoso");
-    } catch (error) {}
+    } catch (error) {
+      const apiError = error as AuthError;
+      toast.error(apiError.message);
+    }
   };
 
   return {
