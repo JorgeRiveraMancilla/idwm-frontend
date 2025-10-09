@@ -20,8 +20,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui";
 
-import { useVerifyEmail } from "../hooks";
-import { useResendCode } from "../hooks/use-resend-code";
+import { useResendCode, useVerifyEmail } from "../hooks";
 
 const formSchema = z.object({
   email: z.email("El correo electrónico no es válido"),
@@ -38,11 +37,7 @@ export function VerifyEmailForm({ email }: Props) {
     isLoading: isVerifying,
     error: verifyError,
   } = useVerifyEmail();
-  const {
-    handleResend,
-    isLoading: isResending,
-    error: resendError,
-  } = useResendCode();
+  const { handleResend, isLoading: isResending } = useResendCode();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
