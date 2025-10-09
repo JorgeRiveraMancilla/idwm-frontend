@@ -14,7 +14,7 @@ import { RegisterForm } from "./register-form";
 
 export function RegisterCard() {
   return (
-    <Card className="w-full max-w-xl h-[600px]">
+    <Card className="w-full max-w-xl my-6">
       <CardHeader className="flex-shrink-0">
         <CardTitle>Regístrate</CardTitle>
         <CardDescription>
@@ -26,7 +26,7 @@ export function RegisterCard() {
           </Button>
         </CardAction>
       </CardHeader>
-      <CardContent className="flex-1 overflow-y-auto">
+      <CardContent className="flex-1">
         <RegisterForm />
       </CardContent>
     </Card>
