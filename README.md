@@ -36,25 +36,37 @@ Once everything is installed, run the project by following the steps in the next
    code .
    ```
 
-4. Copy the `.env.example` content on the `.env` file.
+4. Copy the `.env.local` content on the `.env` file.
 
    ```bash
-   cp .env.example .env
+   cp .env.local .env
    ```
 
-5. Replace `your-api-url-here` with the base URL of your API on the `NEXT_PUBLIC_API_URL` field. If you don't know the URL of your backend, go to the [API Repository](##backend-repository) section and check the port on which the API is running.
+5. In the `.env` file, replace `your-api-url-here` on the `NEXT_PUBLIC_API_URL` field with the base URL of your API. Be sure to enclose the URL in double quotes (“ ”) to avoid errors when reading the `.env` file. If you don't know the URL of your backend, go to the [API Repository](#backend-repository) section and check the port on which the API is running.
 
    ```bash
    NEXT_PUBLIC_API_URL=your-api-url-here
    ```
 
-6. Restore the dependencies on a Visual Studio Code terminal.
+6. Create your NextAuth secret and copy it.
+
+   ```bash
+   npx auth secret
+   ```
+
+7. In the `.env` file, replace `your-auth-secret-here` on the `NEXTAUTH_SECRET` field with the NextAuth secret you copied in the previous step. Be sure to enclose your secret in double quotes (“ ”) to avoid errors when reading the `.env` file.
+
+   ```bash
+   NEXTAUTH_SECRET=your-auth-secret-here
+   ```
+
+8. Restore the dependencies on a Visual Studio Code terminal.
 
    ```bash
    npm i
    ```
 
-7. Execute the project in development mode using the same terminal.
+9. Execute the project in development mode using the same terminal.
 
    ```bash
    npm run dev
