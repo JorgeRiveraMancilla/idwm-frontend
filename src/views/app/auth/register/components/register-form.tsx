@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -8,7 +9,6 @@ import {
   Button,
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -118,187 +118,183 @@ export function RegisterForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        {/* Name Field */}
-        <FormField
-          control={form.control}
-          name="firstName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nombre</FormLabel>
-              <FormControl>
-                <Input placeholder="Juan" {...field} disabled={isLoading} />
-              </FormControl>
-              <FormDescription>De 2 a 20 caracteres máximo.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* Fila 1: Nombre y Apellido */}
+        <div className="grid grid-cols-2 gap-6 items-start">
+          <FormField
+            control={form.control}
+            name="firstName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nombre</FormLabel>
+                <FormControl>
+                  <Input placeholder="Juan" {...field} disabled={isLoading} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        {/* Last Name Field */}
-        <FormField
-          control={form.control}
-          name="lastName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Apellido</FormLabel>
-              <FormControl>
-                <Input placeholder="Pérez" {...field} disabled={isLoading} />
-              </FormControl>
-              <FormDescription>De 2 a 20 caracteres máximo.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="lastName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Apellido</FormLabel>
+                <FormControl>
+                  <Input placeholder="Pérez" {...field} disabled={isLoading} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-        {/* RUT Field */}
-        <FormField
-          control={form.control}
-          name="rut"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>RUT</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="12345678-9"
-                  {...field}
-                  disabled={isLoading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Fila 2: RUT y Género */}
+        <div className="grid grid-cols-2 gap-6 items-start">
+          <FormField
+            control={form.control}
+            name="rut"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>RUT</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="12345678-9"
+                    {...field}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        {/* Genre Field */}
-        <FormField
-          control={form.control}
-          name="gender"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Género</FormLabel>
-              <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  disabled={isLoading}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecciona tu género" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Masculino">Masculino</SelectItem>
-                    <SelectItem value="Femenino">Femenino</SelectItem>
-                    <SelectItem value="Otro">Otro</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="gender"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Género</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={isLoading}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecciona tu género" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Masculino">Masculino</SelectItem>
+                      <SelectItem value="Femenino">Femenino</SelectItem>
+                      <SelectItem value="Otro">Otro</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-        {/* Birth Date Field */}
-        <FormField
-          control={form.control}
-          name="birthDate"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Fecha de Nacimiento</FormLabel>
-              <FormControl>
-                <Input type="date" {...field} disabled={isLoading} />
-              </FormControl>
-              <FormDescription>
-                Debes ser mayor de edad para crear tu cuenta
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Fila 3: Fecha de Nacimiento y Teléfono */}
+        <div className="grid grid-cols-2 gap-6 items-start">
+          <FormField
+            control={form.control}
+            name="birthDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Fecha de Nacimiento</FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} disabled={isLoading} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        {/* Phone Number Field */}
-        <FormField
-          control={form.control}
-          name="phoneNumber"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Número de Teléfono</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="912345678"
-                  {...field}
-                  disabled={isLoading}
-                />
-              </FormControl>
-              <FormDescription>Número chileno válido</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="phoneNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Número de Teléfono</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="912345678"
+                    {...field}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-        {/* Email Field */}
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Correo electrónico</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="correo@ejemplo.com"
-                  {...field}
-                  disabled={isLoading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Fila 4: Email y Contraseña */}
+        <div className="grid grid-cols-2 gap-6 items-start">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Correo electrónico</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="correo@ejemplo.com"
+                    {...field}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        {/* Password Field */}
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Contraseña</FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  placeholder="••••••••"
-                  {...field}
-                  disabled={isLoading}
-                />
-              </FormControl>
-              <FormDescription>
-                Alfanumérica de mínimo 8 caracteres con al menos una mayúscula y
-                un caracter especial
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Contraseña</FormLabel>
+                <FormControl>
+                  <Input
+                    type="password"
+                    placeholder="••••••••"
+                    {...field}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-        {/* Confirm Password Field */}
-        <FormField
-          control={form.control}
-          name="confirmPassword"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Confirmar Contraseña</FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  placeholder="••••••••"
-                  {...field}
-                  disabled={isLoading}
-                />
-              </FormControl>
-              <FormDescription>Repita su contraseña</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Fila 5: Confirmar Contraseña (centrado) */}
+        <div className="grid grid-cols-2 gap-6 items-start">
+          <FormField
+            control={form.control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Confirmar Contraseña</FormLabel>
+                <FormControl>
+                  <Input
+                    type="password"
+                    placeholder="••••••••"
+                    {...field}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div></div> {/* Espacio vacío para mantener la estructura de grid */}
+        </div>
 
         <div className="flex justify-center items-center">
           <Button
@@ -308,6 +304,16 @@ export function RegisterForm() {
           >
             {isLoading ? "Creando cuenta..." : "Crear cuenta"}
           </Button>
+        </div>
+
+        <div className="text-center text-sm text-muted-foreground">
+          ¿Ya tienes una cuenta?{" "}
+          <Link
+            href="/auth/login"
+            className="text-primary hover:underline font-medium"
+          >
+            Inicia sesión aquí
+          </Link>
         </div>
       </form>
     </Form>

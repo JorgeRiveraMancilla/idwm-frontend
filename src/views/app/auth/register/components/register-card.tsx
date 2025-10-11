@@ -1,9 +1,5 @@
-import Link from "next/link";
-
-import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -14,17 +10,12 @@ import { RegisterForm } from "./register-form";
 
 export function RegisterCard() {
   return (
-    <Card className="w-full max-w-xl my-6">
+    <Card className="w-full max-w-4xl mb-6">
       <CardHeader className="flex-shrink-0">
         <CardTitle>Regístrate</CardTitle>
         <CardDescription>
           Ingresa tus datos para crear una cuenta y comenzar a usar el sistema.
         </CardDescription>
-        <CardAction>
-          <Button asChild variant="link" size="sm">
-            <Link href="/auth/login">Inicia Sesión</Link>
-          </Button>
-        </CardAction>
       </CardHeader>
       <CardContent className="flex-1">
         <RegisterForm />
