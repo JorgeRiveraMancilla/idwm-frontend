@@ -137,6 +137,16 @@ export function LoginForm() {
             {isLoading ? "Ingresando..." : "Ingresar"}
           </Button>
         </div>
+
+        <div className="text-center text-sm text-muted-foreground">
+          ¿No tienes una cuenta?{" "}
+          <Link
+            href="/auth/register"
+            className="text-primary hover:underline font-medium"
+          >
+            Regístrate aquí
+          </Link>
+        </div>
       </form>
     </Form>
   );

@@ -1,9 +1,5 @@
-import Link from "next/link";
-
-import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -20,11 +16,6 @@ export function LoginCard() {
         <CardDescription>
           Ingresa tu correo electrónico y contraseña para acceder a tu cuenta.
         </CardDescription>
-        <CardAction>
-          <Button asChild variant="link" size="sm">
-            <Link href="/auth/register">Regístrate</Link>
-          </Button>
-        </CardAction>
       </CardHeader>
       <CardContent>
         <LoginForm />
