@@ -19,6 +19,7 @@ export const authConfig = {
         token.email = user.email;
         token.role = user.role;
         token.exp = user.tokenExp;
+        token.accessToken = user.accessToken;
       }
 
       return token;
@@ -30,6 +31,7 @@ export const authConfig = {
         session.user.email = token.email as string;
         session.user.role = token.role as string;
         session.user.tokenExp = token.tokenExp as number;
+        session.accessToken = token.accessToken as string;
       }
 
       return session;
@@ -82,6 +84,7 @@ export const authConfig = {
             email: user.email,
             role: user.role,
             tokenExp: user.exp,
+            accessToken: token,
           };
         } catch (error) {
           const apiError = handleApiError(error);
@@ -98,4 +101,4 @@ export const authConfig = {
   secret: process.env.NEXTAUTH_SECRET,
 } satisfies NextAuthConfig;
 
-export const { signIn, handlers } = NextAuth(authConfig);
+export const { signIn, handlers, auth } = NextAuth(authConfig);
