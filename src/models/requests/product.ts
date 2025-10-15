@@ -7,8 +7,8 @@ export interface PaginationQueryParams {
 export interface CreateProductRequest {
   title: string;
   description: string;
-  price: string;
-  stock: string;
+  price: number;
+  stock: number;
   status: string;
   categoryName: string;
   brandName: string;
