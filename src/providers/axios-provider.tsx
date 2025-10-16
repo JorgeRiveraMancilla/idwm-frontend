@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getSession } from "next-auth/react";
 
 export const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -9,15 +10,17 @@ export const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use(async config => {
-  try {
-    const res = await fetch("/api/auth/token", { credentials: "include" });
-    const data = await res.json();
+  // Solo intentar obtener la sesión si estamos en el cliente
+  if (typeof window !== "undefined") {
+    const session = await getSession();
+    const token = session?.accessToken;
 
-    if (data.accessToken && config.headers) {
-      config.headers.Authorization = `Bearer ${data.accessToken}`;
+    // Si hay una sesión activa, siempre agregar el token de autorización
+    if (token) {
+      config.headers = config.headers ?? {};
+      (config.headers as Record<string, string>)["Authorization"] =
+        `Bearer ${token}`;
     }
-  } catch (err) {
-    console.error("Error obteniendo token para interceptor:", err);
   }
 
   return config;
