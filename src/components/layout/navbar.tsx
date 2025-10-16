@@ -1,6 +1,13 @@
 "use client";
 
-import { ChevronDownIcon, EditIcon, LogOutIcon, UserIcon } from "lucide-react";
+import {
+  ChevronDownIcon,
+  EditIcon,
+  LogOutIcon,
+  PackageIcon,
+  UserIcon,
+  UsersIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 
@@ -24,15 +31,7 @@ export const Navbar = () => {
   const isAuthenticated = status === "authenticated";
   const isLoading = status === "loading";
   const role = data?.user.role;
-
-  // Navigation items
-  const navigationItems = [
-    { href: "/", label: "Inicio" },
-    {
-      href: role?.toLowerCase() === "admin" ? "/admin/products" : "/products",
-      label: "Productos",
-    },
-  ];
+  const isAdmin = role?.toLowerCase() === "admin";
 
   // Event handlers
   const handleLogout = async () => {
@@ -49,17 +48,57 @@ export const Navbar = () => {
 
         {/* Navigation */}
         <div className="flex flex-1 justify-between items-center ml-8">
-          <ul className="flex space-x-8 font-medium">
-            {navigationItems.map(item => (
-              <li key={item.href}>
+          <ul className="flex space-x-8 font-medium items-center">
+            <li>
+              <Link
+                href="/"
+                className="hover:text-gray-200 transition-colors cursor-pointer"
+              >
+                Inicio
+              </Link>
+            </li>
+
+            {isAdmin ? (
+              <li>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center hover:text-gray-200 transition-colors cursor-pointer">
+                      Administración
+                      <ChevronDownIcon className="h-4 w-4 ml-1" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-48">
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/admin/products"
+                        className="flex items-center cursor-pointer"
+                      >
+                        <PackageIcon className="h-4 w-4 mr-2" />
+                        Productos
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/admin/users"
+                        className="flex items-center cursor-pointer"
+                      >
+                        <UsersIcon className="h-4 w-4 mr-2" />
+                        Usuarios
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </li>
+            ) : (
+              <li>
                 <Link
-                  href={item.href}
+                  href="/products"
                   className="hover:text-gray-200 transition-colors cursor-pointer"
                 >
-                  {item.label}
+                  Productos
                 </Link>
               </li>
-            ))}
+            )}
           </ul>
 
           <ul className="flex space-x-4 font-medium items-center">
