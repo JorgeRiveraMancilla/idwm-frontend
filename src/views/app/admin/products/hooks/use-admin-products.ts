@@ -94,6 +94,7 @@ export const useAdminProducts = () => {
       setToggledProductId(productId);
       await toggleProductAvailability(productId);
       await refetch();
+      toast.success("Producto actualizado exitosamente");
     } catch (error) {
       const apiError = handleApiError(error).details;
       toast.error(apiError);
