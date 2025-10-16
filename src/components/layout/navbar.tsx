@@ -58,7 +58,16 @@ export const Navbar = () => {
               </Link>
             </li>
 
-            {isAdmin ? (
+            <li>
+              <Link
+                href="/products"
+                className="hover:text-gray-200 transition-colors cursor-pointer"
+              >
+                Productos
+              </Link>
+            </li>
+
+            {isAdmin && (
               <li>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -88,15 +97,6 @@ export const Navbar = () => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </li>
-            ) : (
-              <li>
-                <Link
-                  href="/products"
-                  className="hover:text-gray-200 transition-colors cursor-pointer"
-                >
-                  Productos
-                </Link>
               </li>
             )}
           </ul>
