@@ -45,10 +45,10 @@ export function isTokenExpired(
 export function isSessionExpired(
   session: { expires?: string } | null | undefined
 ): boolean {
-  if (!session?.expires) return true; // sin session o expires → considerar expirado
+  if (!session?.expires) return true;
 
-  const expiresDate = new Date(session.expires).getTime(); // timestamp en ms
-  const now = Date.now(); // timestamp actual en ms
+  const expiresDate = new Date(session.expires).getTime();
+  const now = Date.now();
 
   return now >= expiresDate;
 }
