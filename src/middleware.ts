@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-import { getPublicRouteFromAdmin } from "@/lib/utils";
+import { getPublicRouteFromAdmin, isTokenExpired } from "@/lib/auth";
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
@@ -18,6 +18,8 @@ export async function middleware(request: NextRequest) {
     "/auth/login",
     "/auth/register",
     "/auth/verify-email",
+    "/cart",
+    "/checkout",
   ];
 
   const isPublicRoute =
@@ -27,7 +29,7 @@ export async function middleware(request: NextRequest) {
   const isAdminRoute = path.startsWith("/admin/");
 
   // User is authenticated
-  if (token) {
+  if (token && !isTokenExpired(token)) {
     // Get user role from token
     const userRole = token.role as string | undefined;
 
