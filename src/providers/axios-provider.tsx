@@ -1,21 +1,30 @@
 import axios from "axios";
-import { getSession } from "next-auth/react";
+import { getSession, signOut } from "next-auth/react";
+
+import { isSessionExpired } from "@/lib";
 
 export const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   timeout: 10000,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
 axiosInstance.interceptors.request.use(async config => {
-  // Solo intentar obtener la sesión si estamos en el cliente
+  // Try to get the session only on the client side
   if (typeof window !== "undefined") {
     const session = await getSession();
     const token = session?.accessToken;
 
-    // Si hay una sesión activa, siempre agregar el token de autorización
+    // If there is a session, check if it's expired
+    if (session && isSessionExpired(session)) {
+      await signOut({ redirect: false });
+      return Promise.reject(new Error("Token expired"));
+    }
+
+    // If there is an active session, always add the authorization token
     if (token) {
       config.headers = config.headers ?? {};
       (config.headers as Record<string, string>)["Authorization"] =
