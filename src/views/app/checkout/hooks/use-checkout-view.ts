@@ -19,17 +19,19 @@ interface CheckoutChanges {
 }
 
 export function useCheckoutView() {
-  const router = useRouter();
-  const { items, setItems, getTotalItems, getTotalPrice } = useCartStore();
-
+  // State
   const [checkoutChanges, setCheckoutChanges] =
     useState<CheckoutChanges | null>(null);
   const [showCheckoutDialog, setShowCheckoutDialog] = useState(false);
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
 
-  const totalItems = getTotalItems();
-  const totalPrice = getTotalPrice();
+  // Router
+  const router = useRouter();
 
+  // Store
+  const { items, setItems, getTotalItems, getTotalPrice } = useCartStore();
+
+  // API calls
   const {
     data: cart,
     refetch: fetchCart,
@@ -37,6 +39,7 @@ export function useCheckoutView() {
   } = useGetCart();
   const checkoutMutation = useCheckoutMutation();
 
+  // Effects
   useEffect(() => {
     if (cart && cart.data.items.length > 0) {
       setItems(cart.data.items);
@@ -45,6 +48,13 @@ export function useCheckoutView() {
     }
   }, [cart, setItems, router]);
 
+  // Computed values
+  const totalItems = getTotalItems();
+  const totalPrice = getTotalPrice();
+  const hasItems = items.length > 0;
+  const isLoading = isFetching || isCreatingOrder;
+
+  // Helpers
   const detectChanges = (
     oldItems: typeof items,
     newItems: typeof items
@@ -82,8 +92,10 @@ export function useCheckoutView() {
     };
   };
 
+  // Actions
   const handleCheckout = async () => {
-    if (items.length === 0) return;
+    if (!hasItems) return;
+
     setIsCreatingOrder(true);
     try {
       const currentItems = [...items];
@@ -102,29 +114,52 @@ export function useCheckoutView() {
     }
   };
 
-  const createOrder = () => {
+  const handleCreateOrder = () => {
     setShowCheckoutDialog(false);
     setCheckoutChanges(null);
-    //TODO: Agregar lógica de creación de orden
+    //TODO: Add order creation logic here
     toast.success("Pedido creado exitosamente!");
   };
 
-  const cancelCheckout = () => {
+  const handleCancelCheckout = () => {
     setShowCheckoutDialog(false);
     setCheckoutChanges(null);
     toast.info("Revisa tu carrito antes de continuar");
   };
 
+  const handleRefreshCart = () => {
+    fetchCart();
+  };
+
   return {
+    // Cart data
     items,
-    isLoading: isFetching || isCreatingOrder,
-    totalItems,
-    totalPrice,
-    checkoutChanges,
-    showCheckoutDialog,
-    handleCheckout,
-    createOrder,
-    cancelCheckout,
-    fetchCart,
+    cart: {
+      totalItems,
+      totalPrice,
+      hasItems,
+    },
+
+    // Checkout state
+    checkout: {
+      changes: checkoutChanges,
+      showDialog: showCheckoutDialog,
+    },
+
+    // Loading states
+    isLoading,
+    isFetching,
+    isCreatingOrder,
+
+    // Mutation states
+    error: checkoutMutation.error,
+
+    // Actions
+    actions: {
+      handleCheckout,
+      handleCreateOrder,
+      handleCancelCheckout,
+      handleRefreshCart,
+    },
   };
 }

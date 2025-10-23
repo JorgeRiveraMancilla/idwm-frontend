@@ -11,24 +11,21 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Button, Card } from "@/components/ui";
-import { thousandSeparatorPipe } from "@/lib/utils";
+import { thousandSeparatorPipe } from "@/lib";
 
-import { CheckoutDialog } from "../checkout/components";
-import { useCheckoutView } from "../checkout/hooks";
+import { CheckoutDialog } from "./components";
+import { useCheckoutView } from "./hooks";
 
 export default function CheckoutView() {
   const {
     items,
+    cart: { totalPrice, hasItems },
+    checkout: { changes: checkoutChanges, showDialog: showCheckoutDialog },
     isLoading,
-    totalPrice,
-    checkoutChanges,
-    showCheckoutDialog,
-    handleCheckout,
-    createOrder,
-    cancelCheckout,
+    actions: { handleCheckout, handleCreateOrder, handleCancelCheckout },
   } = useCheckoutView();
 
-  if (items.length === 0) {
+  if (!hasItems) {
     return (
       <div className="container mx-auto px-4 py-16 text-center max-w-2xl">
         <ShoppingBag className="w-24 h-24 mx-auto text-muted-foreground/40 mb-4" />
@@ -218,8 +215,8 @@ export default function CheckoutView() {
       <CheckoutDialog
         showCheckoutDialog={showCheckoutDialog}
         checkoutChanges={checkoutChanges}
-        cancelCheckout={cancelCheckout}
-        createOrder={createOrder}
+        cancelCheckout={handleCancelCheckout}
+        createOrder={handleCreateOrder}
       />
     </div>
   );
