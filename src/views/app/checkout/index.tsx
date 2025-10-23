@@ -10,10 +10,14 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 
-import { Button, Card } from "@/components/ui";
+import { Button, Card, Skeleton } from "@/components/ui";
 import { thousandSeparatorPipe } from "@/lib";
 
-import { CheckoutDialog } from "./components";
+import {
+  CheckoutDialog,
+  CheckoutItemSkeleton,
+  CheckoutSummarySkeleton,
+} from "./components";
 import { useCheckoutView } from "./hooks";
 
 export default function CheckoutView() {
@@ -22,10 +26,11 @@ export default function CheckoutView() {
     cart: { totalPrice, hasItems },
     checkout: { changes: checkoutChanges, showDialog: showCheckoutDialog },
     isLoading,
+    showSkeletons,
     actions: { handleCheckout, handleCreateOrder, handleCancelCheckout },
   } = useCheckoutView();
 
-  if (!hasItems) {
+  if (!hasItems && !showSkeletons) {
     return (
       <div className="container mx-auto px-4 py-16 text-center max-w-2xl">
         <ShoppingBag className="w-24 h-24 mx-auto text-muted-foreground/40 mb-4" />
@@ -71,7 +76,10 @@ export default function CheckoutView() {
               </div>
               <div>
                 <h2 className="text-lg font-semibold">
-                  Productos ({items.length})
+                  Productos {!showSkeletons && `(${items.length})`}
+                  {showSkeletons && (
+                    <Skeleton className="inline-block w-8 h-5 ml-1" />
+                  )}
                 </h2>
                 <p className="text-sm text-muted-foreground">
                   Revisa los productos de tu pedido
@@ -80,39 +88,47 @@ export default function CheckoutView() {
             </div>
 
             <div className="space-y-4">
-              {items.map(item => (
-                <div
-                  key={item.productId}
-                  className="flex gap-4 pb-4 border-b last:border-b-0 last:pb-0"
-                >
-                  {item.productImageUrl && (
-                    <div className="relative w-20 h-20 flex-shrink-0">
-                      <Image
-                        src={item.productImageUrl}
-                        alt={item.productTitle}
-                        fill
-                        className="object-cover rounded"
-                      />
+              {showSkeletons ? (
+                <>
+                  {[1, 2, 3].map(i => (
+                    <CheckoutItemSkeleton key={i} />
+                  ))}
+                </>
+              ) : (
+                items.map(item => (
+                  <div
+                    key={item.productId}
+                    className="flex gap-4 pb-4 border-b last:border-b-0 last:pb-0"
+                  >
+                    {item.productImageUrl && (
+                      <div className="relative w-20 h-20 flex-shrink-0">
+                        <Image
+                          src={item.productImageUrl}
+                          alt={item.productTitle}
+                          fill
+                          className="object-cover rounded"
+                        />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium line-clamp-2">
+                        {item.productTitle}
+                      </h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Cantidad: {item.quantity}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        ${thousandSeparatorPipe(item.price)} c/u
+                      </p>
                     </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-medium line-clamp-2">
-                      {item.productTitle}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Cantidad: {item.quantity}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      ${thousandSeparatorPipe(item.price)} c/u
-                    </p>
+                    <div className="text-right flex-shrink-0">
+                      <p className="font-semibold">
+                        ${thousandSeparatorPipe(item.price * item.quantity)}
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className="font-semibold">
-                      ${thousandSeparatorPipe(item.price * item.quantity)}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </Card>
         </div>
@@ -120,61 +136,65 @@ export default function CheckoutView() {
         {/* Right Column - Order Summary */}
         <div className="lg:col-span-1">
           <Card className="p-6 sticky top-4">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-primary/10 rounded-lg">
                 <Receipt className="h-5 w-5 text-primary" />
               </div>
               <h2 className="text-xl font-bold">Resumen del Pedido</h2>
             </div>
 
-            <div className="space-y-3 mb-6">
-              {/* Desglose detallado por producto */}
-              <div className="space-y-2 pb-3 border-b">
-                <p className="text-sm font-medium text-muted-foreground mb-2">
-                  Desglose:
-                </p>
-                {items.map(item => (
-                  <div
-                    key={item.productId}
-                    className="flex justify-between text-xs"
-                  >
-                    <span className="text-muted-foreground">
-                      {item.quantity} × ${thousandSeparatorPipe(item.price)}
-                    </span>
-                    <span className="font-medium">
-                      ${thousandSeparatorPipe(item.price * item.quantity)}
-                    </span>
-                  </div>
-                ))}
-              </div>
+            {showSkeletons ? (
+              <CheckoutSummarySkeleton />
+            ) : (
+              <div className="space-y-3 mb-6">
+                {/* Detailed breakdown by product */}
+                <div className="space-y-2 pb-3 border-b">
+                  <p className="text-sm font-medium text-muted-foreground mb-2">
+                    Desglose:
+                  </p>
+                  {items.map(item => (
+                    <div
+                      key={item.productId}
+                      className="flex justify-between text-xs"
+                    >
+                      <span className="text-muted-foreground">
+                        {item.quantity} × ${thousandSeparatorPipe(item.price)}
+                      </span>
+                      <span className="font-medium">
+                        ${thousandSeparatorPipe(item.price * item.quantity)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
 
-              {/* Subtotal */}
-              <div className="flex justify-between text-sm pt-2">
-                <span className="text-muted-foreground">
-                  Subtotal ({items.length}{" "}
-                  {items.length === 1 ? "producto" : "productos"})
-                </span>
-                <span className="font-medium">
-                  ${thousandSeparatorPipe(totalPrice)}
-                </span>
-              </div>
-
-              {/* Total */}
-              <div className="border-t pt-3 mt-3">
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-lg">Total a Pagar</span>
-                  <span className="font-bold text-2xl text-primary">
+                {/* Subtotal */}
+                <div className="flex justify-between text-sm pt-2">
+                  <span className="text-muted-foreground">
+                    Subtotal ({items.length}{" "}
+                    {items.length === 1 ? "producto" : "productos"})
+                  </span>
+                  <span className="font-medium">
                     ${thousandSeparatorPipe(totalPrice)}
                   </span>
                 </div>
+
+                {/* Total */}
+                <div className="border-t pt-3 mt-3">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-lg">Total a Pagar</span>
+                    <span className="font-bold text-2xl text-primary">
+                      ${thousandSeparatorPipe(totalPrice)}
+                    </span>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
 
             <Button
               className="w-full mb-3 cursor-pointer"
               size="lg"
               onClick={handleCheckout}
-              disabled={isLoading}
+              disabled={isLoading || showSkeletons}
             >
               {isLoading ? (
                 <>
