@@ -13,15 +13,17 @@ import { CartItemRequest } from "@/models/requests";
 import { useCartStore } from "@/stores";
 
 export function useCartDropdown() {
-  const router = useRouter();
+  // State
   const [isOpen, setIsOpen] = useState(false);
   const [isMutating, setIsMutating] = useState(false);
 
+  // Router
+  const router = useRouter();
+
+  // Store
   const { items, setItems, getTotalItems, getTotalPrice } = useCartStore();
 
-  const totalItems = getTotalItems();
-  const totalPrice = getTotalPrice();
-
+  // API calls
   const {
     data: cart,
     refetch: fetchCart,
@@ -31,21 +33,31 @@ export function useCartDropdown() {
   const removeItemMutation = useRemoveItemFromCartMutation();
   const clearCartMutation = useClearCartMutation();
 
+  // Effects
   useEffect(() => {
     if (cart) setItems(cart.data.items);
   }, [cart, setItems]);
 
   useEffect(() => {
-    if (isOpen)
+    if (isOpen) {
       fetchCart().catch(err => {
         const apiError = handleApiError(err).details;
         toast.error(apiError || "Error cargando el carrito");
       });
+    }
   }, [isOpen, fetchCart]);
 
+  // Computed values
+  const totalItems = getTotalItems();
+  const totalPrice = getTotalPrice();
+  const hasItems = items.length > 0;
+  const isLoading = isFetching || isMutating;
+
+  // Actions - Quantity
   const handleQuantityChange = async (item: CartItemRequest, delta: number) => {
     const newQty = item.quantity + delta;
     if (newQty < 1) return;
+
     setIsMutating(true);
     try {
       const updatedData = await updateQuantityMutation.mutateAsync({
@@ -62,6 +74,7 @@ export function useCartDropdown() {
     }
   };
 
+  // Actions - Remove Item
   const handleRemoveItem = async (itemId: string) => {
     setIsMutating(true);
     try {
@@ -76,6 +89,7 @@ export function useCartDropdown() {
     }
   };
 
+  // Actions - Clear Cart
   const handleClearCart = async () => {
     setIsMutating(true);
     try {
@@ -90,6 +104,7 @@ export function useCartDropdown() {
     }
   };
 
+  // Actions - Navigation
   const handleCheckout = () => {
     setIsOpen(false);
     router.push("/checkout");
@@ -100,18 +115,70 @@ export function useCartDropdown() {
     router.push("/cart");
   };
 
+  // Actions - Dropdown
+  const handleOpenDropdown = () => {
+    setIsOpen(true);
+  };
+
+  const handleCloseDropdown = () => {
+    setIsOpen(false);
+  };
+
+  const handleToggleDropdown = () => {
+    setIsOpen(prev => !prev);
+  };
+
+  // Actions - Refresh
+  const handleRefreshCart = () => {
+    fetchCart();
+  };
+
   return {
-    isOpen,
-    setIsOpen,
+    // Dropdown state
+    dropdown: {
+      isOpen,
+    },
+
+    // Cart data
     items,
-    isLoading: isFetching || isMutating,
-    totalItems,
-    totalPrice,
-    handleQuantityChange,
-    handleRemoveItem,
-    handleClearCart,
-    handleCheckout,
-    handleViewCart,
-    fetchCart,
+    cart: {
+      totalItems,
+      totalPrice,
+      hasItems,
+    },
+
+    // Loading states
+    isLoading,
+    isFetching,
+    isMutating,
+
+    // Mutation states
+    errors: {
+      update: updateQuantityMutation.error,
+      remove: removeItemMutation.error,
+      clear: clearCartMutation.error,
+    },
+
+    // Actions
+    actions: {
+      // Quantity actions
+      handleQuantityChange,
+
+      // Item actions
+      handleRemoveItem,
+      handleClearCart,
+
+      // Navigation actions
+      handleCheckout,
+      handleViewCart,
+
+      // Dropdown actions
+      handleOpenDropdown,
+      handleCloseDropdown,
+      handleToggleDropdown,
+
+      // Refresh action
+      handleRefreshCart,
+    },
   };
 }

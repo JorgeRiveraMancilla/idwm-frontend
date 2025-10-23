@@ -7,20 +7,20 @@ import {
   useRemoveItemFromCartMutation,
   useUpdateQuantityMutation,
 } from "@/hooks/api";
-import { handleApiError } from "@/lib/api";
+import { handleApiError } from "@/lib";
 import { CartItemRequest } from "@/models/requests";
 import { useCartStore } from "@/stores";
 
 export function useCartView() {
-  const { items, setItems, getTotalItems, getTotalPrice } = useCartStore();
-
+  // State
   const [itemToRemove, setItemToRemove] = useState<string | null>(null);
   const [clearingCart, setClearingCart] = useState(false);
   const [isMutating, setIsMutating] = useState(false);
 
-  const totalItems = getTotalItems();
-  const totalPrice = getTotalPrice();
+  // Store
+  const { items, setItems, getTotalItems, getTotalPrice } = useCartStore();
 
+  // API calls
   const {
     data: cart,
     refetch: fetchCart,
@@ -30,12 +30,22 @@ export function useCartView() {
   const removeItemMutation = useRemoveItemFromCartMutation();
   const clearCartMutation = useClearCartMutation();
 
+  // Effects
   useEffect(() => {
     if (cart) setItems(cart.data.items);
   }, [cart, setItems]);
 
+  // Computed values
+  const totalItems = getTotalItems();
+  const totalPrice = getTotalPrice();
+  const hasItems = items.length > 0;
+  const isLoading = isFetching || isMutating;
+  const hasItemToRemove = !!itemToRemove;
+
+  // Actions - Quantity
   const handleQuantityChange = async (item: CartItemRequest) => {
     if (item.quantity < 1) return;
+
     setIsMutating(true);
     try {
       const updatedCart = await updateQuantityMutation.mutateAsync(item);
@@ -49,11 +59,14 @@ export function useCartView() {
     }
   };
 
-  const handleRemoveWithConfirmation = (itemId: string) =>
+  // Actions - Remove Item
+  const handleRemoveWithConfirmation = (itemId: string) => {
     setItemToRemove(itemId);
+  };
 
-  const confirmRemove = async () => {
+  const handleConfirmRemove = async () => {
     if (!itemToRemove) return;
+
     setIsMutating(true);
     try {
       const updatedCart = await removeItemMutation.mutateAsync(itemToRemove);
@@ -67,11 +80,19 @@ export function useCartView() {
       setIsMutating(false);
     }
   };
-  const cancelRemove = () => setItemToRemove(null);
 
-  const handleClearWithConfirmation = () => setClearingCart(true);
-  const confirmClean = async () => {
+  const handleCancelRemove = () => {
+    setItemToRemove(null);
+  };
+
+  // Actions - Clear Cart
+  const handleClearWithConfirmation = () => {
+    setClearingCart(true);
+  };
+
+  const handleConfirmClear = async () => {
     if (!clearingCart) return;
+
     setIsMutating(true);
     try {
       const updatedCart = await clearCartMutation.mutateAsync();
@@ -86,22 +107,60 @@ export function useCartView() {
     }
   };
 
-  const cancelClean = () => setClearingCart(false);
+  const handleCancelClear = () => {
+    setClearingCart(false);
+  };
+
+  // Actions - Refresh
+  const handleRefreshCart = () => {
+    fetchCart();
+  };
 
   return {
+    // Cart data
     items,
-    isLoading: isFetching || isMutating,
-    totalItems,
-    totalPrice,
-    itemToRemove,
-    clearingCart,
-    handleQuantityChange,
-    handleRemoveWithConfirmation,
-    confirmRemove,
-    cancelRemove,
-    handleClearWithConfirmation,
-    confirmClean,
-    cancelClean,
-    fetchCart,
+    cart: {
+      totalItems,
+      totalPrice,
+      hasItems,
+    },
+
+    // Dialog states
+    dialogs: {
+      itemToRemove,
+      hasItemToRemove,
+      clearingCart,
+    },
+
+    // Loading states
+    isLoading,
+    isFetching,
+    isMutating,
+
+    // Mutation states
+    errors: {
+      update: updateQuantityMutation.error,
+      remove: removeItemMutation.error,
+      clear: clearCartMutation.error,
+    },
+
+    // Actions
+    actions: {
+      // Quantity actions
+      handleQuantityChange,
+
+      // Remove item actions
+      handleRemoveWithConfirmation,
+      handleConfirmRemove,
+      handleCancelRemove,
+
+      // Clear cart actions
+      handleClearWithConfirmation,
+      handleConfirmClear,
+      handleCancelClear,
+
+      // Refresh action
+      handleRefreshCart,
+    },
   };
 }
