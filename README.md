@@ -36,43 +36,41 @@ Once everything is installed, run the project by following the steps in the next
    code .
    ```
 
-4. Copy the `.env.local` content on the `.env` file.
+4. Copy the `.env.example` content on the `.env.local` file.
 
    ```bash
    cp .env.local .env
    ```
 
-5. In the `.env` file, replace `your-api-url-here` on the `NEXT_PUBLIC_API_URL` field with the base URL of your API. Be sure to enclose the URL in double quotes (“ ”) to avoid errors when reading the `.env` file. If you don't know the URL of your backend, go to the [API Repository](#backend-repository) section and check the port on which the API is running.
+5. In the `.env.local` file, replace `your-api-url-here` on the `NEXT_PUBLIC_API_URL` field with the base URL of your API. Be sure to enclose the URL in double quotes (“ ”) to avoid errors when reading the `.env.local` file. If you don't know the URL of your backend, go to the [API Repository](#backend-repository) section and check the port on which the API is running.
 
    ```bash
    NEXT_PUBLIC_API_URL=your-api-url-here
    ```
 
-6. Create your NextAuth secret and copy it.
+6. Create your NextAuth secret using the command:
 
    ```bash
    npx auth secret
    ```
 
-7. In the `.env` file, replace `your-auth-secret-here` on the `NEXTAUTH_SECRET` field with the NextAuth secret you copied in the previous step. Be sure to enclose your secret in double quotes (“ ”) to avoid errors when reading the `.env` file.
+This command will notice that you already have a variable for `AUTH_SECRET` (in this case, that variable is `NEXTAUTH_SECRET`) in your `.env.local file`, so you should enter `y` when it asks **`Overwrite existing AUTH_SECRET? (y/N)`**.
 
-   ```bash
-   NEXTAUTH_SECRET=your-auth-secret-here
-   ```
+If it is not written directly to your `.env.local`, check if the secret was written on the console and then copy and paste it into the `NEXTAUTH_SECRET` variable in this file.
 
-8. Restore the dependencies on a Visual Studio Code terminal.
+7. Restore the dependencies on a Visual Studio Code terminal.
 
    ```bash
    npm i
    ```
 
-9. Execute the project in development mode using the same terminal.
+8. Execute the project in development mode using the same terminal.
 
    ```bash
    npm run dev
    ```
 
-Once you have followed these steps, you will see that the project is running on `http://localhost:3000`. To see the website, press ctrl and click that address.
+Once you have followed these steps, you will see that the project is running on `http://localhost:3000`. To see the website, press `ctrl` and click that address.
 
 ## Backend Repository
 
