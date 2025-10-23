@@ -17,7 +17,11 @@ export const ProductCard = ({
   onClick,
   isPriority,
 }: ProductCardProps) => {
-  const { isAdding, justAdded, handleAddToCart } = useProductsCart({
+  const {
+    isAdding,
+    justAdded,
+    actions: { handleAddToCart },
+  } = useProductsCart({
     productId: product.id,
     productTitle: product.title,
   });

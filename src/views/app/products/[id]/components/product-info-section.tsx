@@ -17,16 +17,18 @@ export const ProductInfoSection = ({
   discountedPrice,
 }: ProductInfoSectionProps) => {
   const {
-    localQuantity,
-    isInCart,
-    hasChanges,
+    quantity: { local: localQuantity },
+    cart: { isInCart, hasChanges },
+    validation: { canIncrement, canDecrement, canResetQuantity, canSetMax },
     isAdding,
     buttonText,
-    handleIncrement,
-    handleDecrement,
-    handleAddToCart,
-    handleResetQuantity,
-    handleSetMax,
+    actions: {
+      handleIncrement,
+      handleDecrement,
+      handleAddToCart,
+      handleResetQuantity,
+      handleSetMax,
+    },
   } = useProductDetailCart({
     productId: product.id,
     productTitle: product.title,
@@ -88,7 +90,7 @@ export const ProductInfoSection = ({
               size="sm"
               className="text-gray-800 hover:text-gray-900 cursor-pointer"
               onClick={handleResetQuantity}
-              disabled={localQuantity === 1 || isAdding}
+              disabled={!canResetQuantity || isAdding}
             >
               Reset
             </Button>
@@ -98,7 +100,7 @@ export const ProductInfoSection = ({
               size="icon"
               className="h-8 w-8 shrink-0 rounded-full cursor-pointer"
               onClick={handleDecrement}
-              disabled={localQuantity <= 1 || isAdding}
+              disabled={!canDecrement || isAdding}
             >
               <Minus className="h-4 w-4" />
               <span className="sr-only">Disminuir</span>
@@ -119,7 +121,7 @@ export const ProductInfoSection = ({
               size="icon"
               className="h-8 w-8 shrink-0 rounded-full cursor-pointer"
               onClick={handleIncrement}
-              disabled={localQuantity >= product.stock || isAdding}
+              disabled={!canIncrement || isAdding}
             >
               <Plus className="h-4 w-4" />
               <span className="sr-only">Aumentar</span>
@@ -130,7 +132,7 @@ export const ProductInfoSection = ({
               size="sm"
               className="text-gray-800 hover:text-gray-900 cursor-pointer"
               onClick={handleSetMax}
-              disabled={localQuantity === product.stock || isAdding}
+              disabled={!canSetMax || isAdding}
             >
               Max
             </Button>
