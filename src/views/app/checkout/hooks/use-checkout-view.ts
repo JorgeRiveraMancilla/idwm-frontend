@@ -1,7 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { useCheckoutMutation, useGetCart } from "@/hooks/api";
@@ -25,16 +24,13 @@ export function useCheckoutView() {
   const [showCheckoutDialog, setShowCheckoutDialog] = useState(false);
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
+  const hasInitialized = useRef(false);
 
   // Store
   const { items, setItems, getTotalItems, getTotalPrice } = useCartStore();
 
   // API calls
-  const {
-    data: cart,
-    refetch: fetchCart,
-    isLoading: isFetching,
-  } = useGetCart();
+  const { refetch: fetchCart, isLoading: isFetching } = useGetCart();
   const checkoutMutation = useCheckoutMutation();
 
   // Computed values
@@ -46,6 +42,9 @@ export function useCheckoutView() {
 
   // Effects
   useEffect(() => {
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
+
     const initializeCheckout = async () => {
       if (!hasItems) {
         setIsInitializing(false);
@@ -65,7 +64,7 @@ export function useCheckoutView() {
     };
 
     initializeCheckout();
-  }, []);
+  }, [fetchCart, hasItems, setItems]);
 
   // Helpers
   const detectChanges = (
