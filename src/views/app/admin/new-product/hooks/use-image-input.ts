@@ -13,8 +13,10 @@ export function useImageInput({
   onChange,
   onBlur,
 }: UseImageInputParams) {
+  // State
   const [previews, setPreviews] = useState<string[]>([]);
 
+  // Effects
   useEffect(() => {
     const validFiles = value.filter(file => file instanceof File);
     const urls = validFiles.map(file => URL.createObjectURL(file));
@@ -23,6 +25,17 @@ export function useImageInput({
     return () => urls.forEach(url => URL.revokeObjectURL(url));
   }, [value]);
 
+  // Computed values
+  const totalSize = value.reduce((sum, file) => sum + file.size, 0);
+
+  // Helpers
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  // Actions
   const handleFiles = (files: FileList | null) => {
     if (!files) return;
 
@@ -46,19 +59,19 @@ export function useImageInput({
     onBlur?.();
   };
 
-  const totalSize = value.reduce((sum, file) => sum + file.size, 0);
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  };
-
   return {
+    // Preview state
     previews,
-    handleFiles,
-    removeImage,
-    removeAll,
+
+    // Computed values
     totalSize,
-    formatFileSize,
+
+    // Actions
+    actions: {
+      handleFiles,
+      removeImage,
+      removeAll,
+      formatFileSize,
+    },
   };
 }

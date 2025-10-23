@@ -6,11 +6,14 @@ import { handleApiError } from "@/lib/api";
 import { CreateProductRequest } from "@/models/requests";
 
 export const useNewProduct = () => {
+  // Router
+  const router = useRouter();
+
+  // API calls
   const { mutateAsync: createProductAsync, isPending: isCreatingProduct } =
     useCreateProductMutation();
 
-  const router = useRouter();
-
+  // Actions
   const handleCreateProduct = async (productData: CreateProductRequest) => {
     try {
       const productFormData = new FormData();
@@ -37,7 +40,12 @@ export const useNewProduct = () => {
   };
 
   return {
-    handleCreateProduct,
+    // Loading state
     isLoading: isCreatingProduct,
+
+    // Actions
+    actions: {
+      handleCreateProduct,
+    },
   };
 };
