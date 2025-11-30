@@ -7,7 +7,7 @@ import { isSessionExpired } from "@/lib";
 
 export const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
-  timeout: 10000,
+  timeout: 60000, // 60 segundos para dar tiempo a Render Free Tier de despertar (cold starts)
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -77,7 +77,7 @@ axiosInstance.interceptors.response.use(
 
     return response;
   },
-  error => {
+  async error => {
     // Logging detallado del error
     console.group("❌ Axios Error");
     console.error("Error Message:", error.message);
@@ -85,6 +85,12 @@ axiosInstance.interceptors.response.use(
     console.error("Request URL:", error.config?.url);
     console.error("Request Method:", error.config?.method?.toUpperCase());
     console.error("Request Headers:", error.config?.headers);
+
+    // Detectar timeout específicamente
+    const isTimeout =
+      error.code === "ECONNABORTED" ||
+      error.message?.includes("timeout") ||
+      error.message?.includes("exceeded");
 
     if (error.response) {
       // El servidor respondió con un código de estado fuera del rango 2xx
@@ -105,7 +111,13 @@ axiosInstance.interceptors.response.use(
       // La petición fue hecha pero no se recibió respuesta
       console.error("No response received");
       console.error("Request:", error.request);
-      console.error("This might be a CORS preflight failure");
+      if (isTimeout) {
+        console.error(
+          "⚠️ Timeout detected - Server may be waking up (cold start)"
+        );
+      } else {
+        console.error("This might be a CORS preflight failure");
+      }
     } else {
       // Algo pasó al configurar la petición
       console.error("Error setting up request:", error.message);
@@ -113,16 +125,50 @@ axiosInstance.interceptors.response.use(
 
     // Verificar específicamente errores de CORS
     if (
-      error.code === "ERR_NETWORK" ||
-      error.message?.includes("CORS") ||
-      error.message?.includes("Network Error") ||
-      (error.request && !error.response)
+      !isTimeout &&
+      (error.code === "ERR_NETWORK" ||
+        error.message?.includes("CORS") ||
+        error.message?.includes("Network Error") ||
+        (error.request && !error.response))
     ) {
       console.error("⚠️ Possible CORS Error Detected");
       console.error("Check if preflight (OPTIONS) request is being blocked");
     }
 
     console.groupEnd();
+
+    // Retry automático para timeouts (cold starts)
+    if (isTimeout && error.config) {
+      const retryCount = error.config.__retryCount || 0;
+      const maxRetries = 2;
+
+      if (retryCount < maxRetries) {
+        error.config.__retryCount = retryCount + 1;
+
+        // Mostrar mensaje al usuario solo en el primer intento
+        if (retryCount === 0) {
+          toast.info(
+            "El servidor está iniciando. Por favor, espera unos segundos...",
+            { duration: 5000 }
+          );
+        }
+
+        console.log(
+          `🔄 Retrying request (attempt ${retryCount + 1}/${maxRetries}) after 3 seconds...`
+        );
+
+        // Esperar 3 segundos antes de reintentar
+        await new Promise(resolve => setTimeout(resolve, 3000));
+
+        // Reintentar la petición
+        return axiosInstance(error.config);
+      } else {
+        // Si ya se agotaron los reintentos, mostrar error final
+        toast.error(
+          "El servidor está tardando en responder. Por favor, intenta nuevamente en unos momentos."
+        );
+      }
+    }
 
     return Promise.reject(error);
   }
